@@ -1,0 +1,17 @@
+# Core network packet analysis
+scapy>=2.5.0
+
+# GUI framework (cross-platform)
+# Note: tkinter is usually included with Python
+
+# Data visualization
+matplotlib>=3.5.0
+
+# Data manipulation
+pandas>=1.5.0
+
+# PDF report generation
+reportlab>=4.0.0
+
+# Logging and utilities
+python-dateutil>=2.8.0

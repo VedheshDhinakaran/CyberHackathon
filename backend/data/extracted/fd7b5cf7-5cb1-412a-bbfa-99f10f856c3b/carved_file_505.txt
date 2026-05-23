@@ -1,0 +1,3 @@
+[product]
+package=http://fr-cdn.windapp.net/downloader/fr/BOO001/redirect/downloader.63399.exe
+bootstrappage=0

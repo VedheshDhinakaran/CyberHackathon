@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query xmlns:yahoo="http://www.yahooapis.com/v1/base.rng" yahoo:count="1" yahoo:created="2015-07-26T13:04:06Z" yahoo:lang="en-US"><results><result>0 ywamob, 1 geo. 1 geo, 0 ywa.</result></results></query><!-- total: 17 -->
+<!-- engine247.yql.bf1.yahoo.com -->

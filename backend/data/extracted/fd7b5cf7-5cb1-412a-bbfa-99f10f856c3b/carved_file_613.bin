@@ -1,0 +1,3 @@
+document.open();
+document.writeln('<sc'+'ript type=\"text\/javasc'+'ript\" language=\"JavaScript\" src=\"http:\/\/d.ligatus.com\/yield\/setcookie?d=105&s=1&t=6\"><\/sc'+'ript>');
+document.close();

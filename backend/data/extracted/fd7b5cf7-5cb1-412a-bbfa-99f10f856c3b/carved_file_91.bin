@@ -1,0 +1,3 @@
+var OX_8523d0dc = '';
+OX_8523d0dc += "<"+"div class=\"banner left\"><"+"iframe width=\"300\" height=\"169\" src=\"//www.youtube.com/embed/K8cOBWwA1UA?rel=0\" frameborder=\"0\" allowfullscreen><"+"/iframe><"+"div id=\'beacon_0984329512\' style=\'position: absolute; left: 0px; top: 0px; visibility: hidden;\'><"+"img src=\'http://oglasi.novisplet.com/www/delivery/lg.php?bannerid=1702&amp;campaignid=206&amp;zoneid=112&amp;loc=1&amp;referer=http%3A%2F%2Fwww.sloveniatimes.com%2F&amp;cb=0984329512\' width=\'0\' height=\'0\' alt=\'\' style=\'width: 0px; height: 0px;\' /><"+"/div><"+"/div>\n";
+document.write(OX_8523d0dc);

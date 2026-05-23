@@ -1,0 +1,1 @@
+!function($){$.fn.appendAround=function(){return this.each(function(){function n(n){return"none"===$(n).css("display")}function t(){if(n(r)){var t=0;s.each(function(){n(this)||t||(i.appendTo(this),t++,r=this)})}}var i=$(this),e="data-set",a=i.parent(),r=a[0],o=a.attr(e),s=$("["+e+"='"+o+"']");t(),$(window).bind("resize",t)})}}(jQuery);

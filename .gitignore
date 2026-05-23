@@ -1,48 +1,54 @@
 # Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
 *.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
 # Virtual Environment
 venv/
-.env/
-.venv/
+ENV/
+env/
 
-# VS Code
+# IDE
 .vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
 
 # Logs
-logs/*.log
 *.log
+logs/
+forensic_analysis.log
 
-# Outputs
-outputs/*.json
-outputs/*.html
-outputs/*.txt
+# Test files
+test_captures/
+*.pcap
+*.pcapng
 
-# Sample Outputs
-sample_outputs/*.json
-sample_outputs/*.html
-
-# Screenshots
-screenshots/*.png
-screenshots/*.jpg
-screenshots/*.jpeg
-
-# Dataset / PCAP Files
-pcaps/*.pcap
-pcaps/*.pcapng
-pcaps/*.cap
-
-# OS Files
-.DS_Store
-Thumbs.db
-
-# Jupyter
-.ipynb_checkpoints/
-
-# Temporary Files
+# Temporary files
+tmp/
+temp/
 *.tmp
-*.bak
+
+# OS
+Thumbs.db
+.Spotlight-V100
+.Trashes

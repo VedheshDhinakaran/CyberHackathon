@@ -1,0 +1,10 @@
+$(document).ready(function() {
+	var cookie_policy_notice = getCookie("cookie_policy_notice");
+	if (cookie_policy_notice==null || cookie_policy_notice=="") {
+		$("#cookie_policy_notice").css("display", "block");
+		$("#cookie_policy_notice .notice_close").click(function() {
+			setCookie("cookie_policy_notice",1,365);
+			$(".notice_close").parent().parent().slideUp();
+		});
+	}
+});

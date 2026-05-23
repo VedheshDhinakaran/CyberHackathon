@@ -1,0 +1,3 @@
+var OX_5fd3a5af = '';
+OX_5fd3a5af += "<"+"div class=\"banner left\"><"+"iframe width=\"300\" height=\"169\" src=\"//www.youtube.com/embed/K8cOBWwA1UA?rel=0\" frameborder=\"0\" allowfullscreen><"+"/iframe><"+"div id=\'beacon_c870e109e3\' style=\'position: absolute; left: 0px; top: 0px; visibility: hidden;\'><"+"img src=\'http://oglasi.novisplet.com/www/delivery/lg.php?bannerid=1702&amp;campaignid=206&amp;zoneid=112&amp;loc=1&amp;referer=http%3A%2F%2Fwww.sloveniatimes.com%2Fsubscribe-to-slovenia-times-magazine&amp;cb=c870e109e3\' width=\'0\' height=\'0\' alt=\'\' style=\'width: 0px; height: 0px;\' /><"+"/div><"+"/div>\n";
+document.write(OX_5fd3a5af);

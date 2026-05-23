@@ -1,0 +1,13 @@
+{ "meta": {},
+  "data": {
+    "id": "0",
+    "name": "",
+    "subscription": [],
+    "country": "(null)",
+    "gender": "(null)",
+    "income_low": "0",
+    "income_high": "0",
+    "jobtitle": "0",
+    "jobindustry": "0"
+  }
+}

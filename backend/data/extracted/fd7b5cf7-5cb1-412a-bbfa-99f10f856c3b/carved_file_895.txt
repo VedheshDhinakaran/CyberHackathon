@@ -1,0 +1,8 @@
+[detect]
+name0=
+[vars]
+name0=lastPartnerUpdate
+rootkey0=HKCU
+key0=Software\WTools\Selection Tools
+value0=lastPartnerUpdate
+type0=str

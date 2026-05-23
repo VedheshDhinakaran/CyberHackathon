@@ -1,0 +1,373 @@
+================================================================================
+FORENSIC ANALYSIS REPORT
+Network Packet Investigator - Digital Forensics Tool
+================================================================================
+
+CASE INFORMATION
+--------------------------------------------------------------------------------
+Case Name: Network Forensic Investigation
+Analyst: Digital Forensics Team
+Report Generated: 2025-12-24 03:14:09
+Tool Version: 1.0.0
+
+CASE DESCRIPTION
+--------------------------------------------------------------------------------
+This forensic analysis examines network traffic patterns to identify
+indicators of compromise and suspicious activities in the captured
+network data.
+
+
+EXECUTIVE SUMMARY
+--------------------------------------------------------------------------------
+Analysis of network capture identified 3710 packets
+across multiple protocols. The investigation revealed:
+
+  - 18 DNS queries to 16 unique domains
+  - 43 HTTP requests to 9 unique hosts
+  - 94 unique TCP connections
+  - 2184063 bytes transferred
+
+Threat Detection Results:
+  - Total Findings: 33
+  - High Severity: 4
+  - Medium Severity: 29
+
+
+DETAILED ANALYSIS RESULTS
+================================================================================
+
+1. PROTOCOL DISTRIBUTION
+--------------------------------------------------------------------------------
+Total Packets Analyzed: 3710
+
+  TCP       :   3566 packets (96.12%)
+  UDP       :     83 packets ( 2.24%)
+  ICMP      :      0 packets ( 0.00%)
+  DNS       :     18 packets ( 0.49%)
+  HTTP      :     43 packets ( 1.16%)
+  Other     :      0 packets ( 0.00%)
+
+2. DNS ACTIVITY ANALYSIS
+--------------------------------------------------------------------------------
+Total DNS Queries: 18
+Unique Domains: 16
+
+Top 10 Queried Domains:
+   1. go.microsoft.com                                   (   2 queries)
+   2. ctldl.windowsupdate.com                            (   2 queries)
+   3. config.edge.skype.com                              (   1 queries)
+   4. nexusrules.officeapps.live.com                     (   1 queries)
+   5. iecvlist.microsoft.com                             (   1 queries)
+   6. ocsp.digicert.com                                  (   1 queries)
+   7. fs.microsoft.com                                   (   1 queries)
+   8. ieonline.microsoft.com                             (   1 queries)
+   9. www.microsoft.com                                  (   1 queries)
+  10. cdnjs.cloudflare.com                               (   1 queries)
+
+3. HTTP ACTIVITY ANALYSIS
+--------------------------------------------------------------------------------
+Total HTTP Requests: 43
+Unique URLs: 41
+Unique Hosts: 9
+
+HTTP Method Distribution:
+  GET       :   40 requests
+  POST      :    3 requests
+
+Top 10 HTTP Hosts:
+   1. 103.232.55.148                                     (  16 requests)
+   2. api.bing.com                                       (  12 requests)
+   3. ocsp.digicert.com                                  (   6 requests)
+   4. 136.243.159.53                                     (   3 requests)
+   5. ctldl.windowsupdate.com                            (   2 requests)
+   6. www.microsoft.com                                  (   1 requests)
+   7. cdnjs.cloudflare.com                               (   1 requests)
+   8. code.jquery.com                                    (   1 requests)
+   9. connect.facebook.net                               (   1 requests)
+
+4. TCP SESSION ANALYSIS
+--------------------------------------------------------------------------------
+Total TCP Sessions: 3566
+Unique Connections: 94
+Total Data Transferred: 2,184,063 bytes
+
+Top 10 Connections by Data Volume:
+   1. 103.232.55.148:80 -> 10.0.0.168:49724
+      Bytes: 600,906, Packets: 415
+   2. 103.232.55.148:80 -> 10.0.0.168:49705
+      Bytes: 490,200, Packets: 341
+   3. 204.79.197.200:443 -> 10.0.0.168:49694
+      Bytes: 232,326, Packets: 182
+   4. 103.232.55.148:80 -> 10.0.0.168:49711
+      Bytes: 192,384, Packets: 136
+   5. 31.13.64.21:443 -> 10.0.0.168:49716
+      Bytes: 71,809, Packets: 67
+   6. 2.16.119.157:443 -> 10.0.0.168:49701
+      Bytes: 70,185, Packets: 53
+   7. 2.16.119.157:443 -> 10.0.0.168:49702
+      Bytes: 70,185, Packets: 53
+   8. 2.16.119.157:443 -> 10.0.0.168:49692
+      Bytes: 52,722, Packets: 45
+   9. 2.16.119.157:443 -> 10.0.0.168:49700
+      Bytes: 52,665, Packets: 41
+  10. 103.232.55.148:80 -> 10.0.0.168:49706
+      Bytes: 51,691, Packets: 39
+
+5. IP COMMUNICATION ANALYSIS
+--------------------------------------------------------------------------------
+Top 10 Data Senders:
+   1. 103.232.55.148       -     1.40 MB sent
+   2. 2.16.119.157         -     0.24 MB sent
+   3. 204.79.197.200       -     0.24 MB sent
+   4. 10.0.0.168           -     0.15 MB sent
+   5. 31.13.64.21          -     0.08 MB sent
+   6. 69.16.175.10         -     0.03 MB sent
+   7. 72.21.81.200         -     0.03 MB sent
+   8. 13.107.42.23         -     0.03 MB sent
+   9. 52.109.8.21          -     0.02 MB sent
+  10. 23.62.131.230        -     0.01 MB sent
+
+
+THREAT DETECTION FINDINGS
+================================================================================
+
+
+HIGH SEVERITY FINDINGS (4)
+--------------------------------------------------------------------------------
+
+Finding #1: UNUSUAL_PORT
+Description: Unusual port usage detected: 49694 (182 occurrences)
+port_info: 49694
+usage_count: 182
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #2: UNUSUAL_PORT
+Description: Unusual port usage detected: 49705 (341 occurrences)
+port_info: 49705
+usage_count: 341
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #3: UNUSUAL_PORT
+Description: Unusual port usage detected: 49711 (136 occurrences)
+port_info: 49711
+usage_count: 136
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #4: UNUSUAL_PORT
+Description: Unusual port usage detected: 49724 (415 occurrences)
+port_info: 49724
+usage_count: 415
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+MEDIUM SEVERITY FINDINGS (29)
+--------------------------------------------------------------------------------
+
+Finding #1: UNKNOWN_DOMAIN
+Description: DNS queries to unknown/uncommon domain: config.edge.skype.com
+domain: config.edge.skype.com
+query_count: 1
+Recommendation: Investigate domain reputation and purpose. Check if domain is associated with phishing or malware campaigns.
+
+Finding #2: UNKNOWN_DOMAIN
+Description: DNS queries to unknown/uncommon domain: ocsp.digicert.com
+domain: ocsp.digicert.com
+query_count: 1
+Recommendation: Investigate domain reputation and purpose. Check if domain is associated with phishing or malware campaigns.
+
+Finding #3: UNKNOWN_DOMAIN
+Description: DNS queries to unknown/uncommon domain: code.jquery.com
+domain: code.jquery.com
+query_count: 1
+Recommendation: Investigate domain reputation and purpose. Check if domain is associated with phishing or malware campaigns.
+
+Finding #4: UNKNOWN_DOMAIN
+Description: DNS queries to unknown/uncommon domain: connect.facebook.net
+domain: connect.facebook.net
+query_count: 1
+Recommendation: Investigate domain reputation and purpose. Check if domain is associated with phishing or malware campaigns.
+
+Finding #5: SUSPICIOUS_IP_COMMUNICATION
+Description: Suspicious communication pattern: 10.0.0.168 -> 103.232.55.148 (1063 packets)
+source_ip: 10.0.0.168
+destination_ip: 103.232.55.148
+packet_count: 1063
+Recommendation: Investigate the destination IP address. Check if it's associated with known malicious activity or command-and-control servers.
+
+Finding #6: SUSPICIOUS_IP_COMMUNICATION
+Description: Suspicious communication pattern: 10.0.0.168 -> 204.79.197.200 (196 packets)
+source_ip: 10.0.0.168
+destination_ip: 204.79.197.200
+packet_count: 196
+Recommendation: Investigate the destination IP address. Check if it's associated with known malicious activity or command-and-control servers.
+
+Finding #7: SUSPICIOUS_IP_COMMUNICATION
+Description: Suspicious communication pattern: 10.0.0.168 -> 2.16.119.157 (166 packets)
+source_ip: 10.0.0.168
+destination_ip: 2.16.119.157
+packet_count: 166
+Recommendation: Investigate the destination IP address. Check if it's associated with known malicious activity or command-and-control servers.
+
+Finding #8: SUSPICIOUS_IP_COMMUNICATION
+Description: Suspicious communication pattern: 10.0.0.168 -> 31.13.64.21 (82 packets)
+source_ip: 10.0.0.168
+destination_ip: 31.13.64.21
+packet_count: 82
+Recommendation: Investigate the destination IP address. Check if it's associated with known malicious activity or command-and-control servers.
+
+Finding #9: UNUSUAL_PORT
+Description: Unusual port usage detected: 49681 (29 occurrences)
+port_info: 49681
+usage_count: 29
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #10: UNUSUAL_PORT
+Description: Unusual port usage detected: 49680 (15 occurrences)
+port_info: 49680
+usage_count: 15
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #11: UNUSUAL_PORT
+Description: Unusual port usage detected: 49682 (24 occurrences)
+port_info: 49682
+usage_count: 24
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #12: UNUSUAL_PORT
+Description: Unusual port usage detected: 49684 (25 occurrences)
+port_info: 49684
+usage_count: 25
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #13: UNUSUAL_PORT
+Description: Unusual port usage detected: 49686 (11 occurrences)
+port_info: 49686
+usage_count: 11
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #14: UNUSUAL_PORT
+Description: Unusual port usage detected: 49687 (14 occurrences)
+port_info: 49687
+usage_count: 14
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #15: UNUSUAL_PORT
+Description: Unusual port usage detected: 49692 (45 occurrences)
+port_info: 49692
+usage_count: 45
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #16: UNUSUAL_PORT
+Description: Unusual port usage detected: 49693 (14 occurrences)
+port_info: 49693
+usage_count: 14
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #17: UNUSUAL_PORT
+Description: Unusual port usage detected: 49697 (13 occurrences)
+port_info: 49697
+usage_count: 13
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #18: UNUSUAL_PORT
+Description: Unusual port usage detected: 49698 (12 occurrences)
+port_info: 49698
+usage_count: 12
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #19: UNUSUAL_PORT
+Description: Unusual port usage detected: 49700 (41 occurrences)
+port_info: 49700
+usage_count: 41
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #20: UNUSUAL_PORT
+Description: Unusual port usage detected: 49701 (53 occurrences)
+port_info: 49701
+usage_count: 53
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #21: UNUSUAL_PORT
+Description: Unusual port usage detected: 49702 (53 occurrences)
+port_info: 49702
+usage_count: 53
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #22: UNUSUAL_PORT
+Description: Unusual port usage detected: 49712 (31 occurrences)
+port_info: 49712
+usage_count: 31
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #23: UNUSUAL_PORT
+Description: Unusual port usage detected: 49706 (39 occurrences)
+port_info: 49706
+usage_count: 39
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #24: UNUSUAL_PORT
+Description: Unusual port usage detected: 49707 (19 occurrences)
+port_info: 49707
+usage_count: 19
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #25: UNUSUAL_PORT
+Description: Unusual port usage detected: 49716 (67 occurrences)
+port_info: 49716
+usage_count: 67
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #26: UNUSUAL_PORT
+Description: Unusual port usage detected: 49718 (17 occurrences)
+port_info: 49718
+usage_count: 17
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #27: UNUSUAL_PORT
+Description: Unusual port usage detected: 49719 (14 occurrences)
+port_info: 49719
+usage_count: 14
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #28: UNUSUAL_PORT
+Description: Unusual port usage detected: 49722 (27 occurrences)
+port_info: 49722
+usage_count: 27
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+Finding #29: UNUSUAL_PORT
+Description: Unusual port usage detected: 49746 (12 occurrences)
+port_info: 49746
+usage_count: 12
+Recommendation: Investigate the service running on this port. Verify if it's legitimate business traffic or potential backdoor/tunnel.
+
+INDICATORS OF COMPROMISE (IOCs)
+--------------------------------------------------------------------------------
+
+Suspicious Domains:
+  - code.jquery.com
+  - config.edge.skype.com
+  - connect.facebook.net
+  - ocsp.digicert.com
+
+Suspicious IP Addresses:
+  - 103.232.55.148
+  - 2.16.119.157
+  - 204.79.197.200
+  - 31.13.64.21
+
+
+ANALYST CONCLUSION
+--------------------------------------------------------------------------------
+Based on the forensic analysis of network traffic, this investigation identified 4 high-severity findings indicating potential security incidents. The evidence suggests possible phishing activity and/or data exfiltration attempts.
+
+RECOMMENDATIONS:
+1. Isolate affected systems immediately
+2. Investigate identified indicators of compromise
+3. Review authentication logs for compromised credentials
+4. Conduct malware analysis on affected endpoints
+5. Implement network segmentation and monitoring
+6. Update security policies and user training
+
+================================================================================
+END OF REPORT
+================================================================================

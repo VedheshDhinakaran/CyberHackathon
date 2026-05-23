@@ -1,0 +1,40 @@
+setTimeout(function(){
+    'use strict';
+    try{
+        var stringifyFunc = null;
+		if(window.JSON){
+			stringifyFunc = window.JSON.stringify;
+		} else {
+			if(window.parent && window.parent.JSON){
+				stringifyFunc = window.parent.JSON.stringify;
+			}
+		}
+		if(!stringifyFunc){
+			return;
+		}
+        var msg = {
+            action: 'notifyBrandShieldAdEntityInformation',
+            bsAdEntityInformation: {
+                brandShieldId:'004123a508c54f5c9daf493b8bd295d9',
+                comparisonItems:[{name : 'cmp', value : 2485047},{name : 'plmt', value : 2485650}]
+            }
+        };
+        var msgString = stringifyFunc(msg);
+        var bst2tWin = null;
+
+        var findAndSendMessage = function() {
+            if (!bst2tWin) {
+                var frame = document.getElementById('bst2t_389251274755');
+                if (frame) {
+                    bst2tWin = frame.contentWindow;
+                }
+            }
+
+            if (bst2tWin) {
+                bst2tWin.postMessage(msgString, '*');
+            }
+        };
+
+        findAndSendMessage();
+        setTimeout(findAndSendMessage, 50);
+        setTimeout(findAndSendMe

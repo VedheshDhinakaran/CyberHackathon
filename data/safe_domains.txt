@@ -1,0 +1,80 @@
+# Safe/Trusted Domains List
+# Network Packet Investigator - Digital Forensics Tool
+#
+# This file contains a list of known safe and trusted domains.
+# These domains will not trigger "unknown domain" alerts during analysis.
+# Add one domain per line. Lines starting with # are comments.
+
+# Major search engines
+google.com
+www.google.com
+googleapis.com
+gstatic.com
+bing.com
+yahoo.com
+duckduckgo.com
+
+# Microsoft services
+microsoft.com
+windows.com
+msftconnecttest.com
+windowsupdate.com
+office.com
+live.com
+outlook.com
+azure.com
+
+# Apple services
+apple.com
+icloud.com
+mzstatic.com
+apple-dns.net
+
+# Amazon and AWS
+amazon.com
+amazonaws.com
+cloudfront.net
+aws.amazon.com
+
+# Social media
+facebook.com
+fbcdn.net
+instagram.com
+twitter.com
+twimg.com
+linkedin.com
+licdn.com
+reddit.com
+
+# CDN and infrastructure
+cloudflare.com
+cdnjs.cloudflare.com
+akamai.com
+fastly.com
+
+# Development platforms
+github.com
+githubusercontent.com
+gitlab.com
+stackoverflow.com
+
+# Update services
+ubuntu.com
+debian.org
+centos.org
+redhat.com
+
+# Common legitimate services
+dropbox.com
+zoom.us
+slack.com
+teams.microsoft.com
+
+# DNS servers
+dns.google
+one.one.one.one
+quad9.net
+
+# Add your organization's trusted domains below:
+# example-corp.com
+# internal-domain.local

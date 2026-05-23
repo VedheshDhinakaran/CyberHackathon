@@ -1,0 +1,22 @@
+.main-content h1 { font-family: 'Fjalla One', sans-serif; font-size: 30px; font-weight: normal; color: #333333;}
+.main-content h2 { font-size: 16px; color: #333333;}
+.main-content h3 { font-size: 14px; color: #333333;}
+.main-content h4 { font-size: 12px; color: #333333;}
+.about { float: left; margin-right: 15px;}
+.icons { float: left;}
+
+.images{ float: right; margin: 0 0 15px 15px; width: 300px;}
+
+#news_social a{ margin: 0 10px 0 0;}
+
+#news_social .fb_link a{ background: url(../images/icons-social-big.jpg) no-repeat;	height:22px; width:84px; float: left;}
+#news_social .tw_link a{ background: url(../images/icons-social-big.jpg) no-repeat -83px 0;	height:22px; width:83px; float: left;}
+#news_social .send_link{ background: url(../images/icons-social-big.jpg) no-repeat -166px 0; height:22px; width:83px; padding: 4px 0 0 25px; float: left; text-decoration: none; font-size: 11px; color: #44545e;}
+
+.main-content a.col-blue{ color: #004071;}
+
+.comment_content{ width: 300px; height: 100px;}
+.text { width: 300px;}
+
+.read_also_block a{ color: #004071; font-family: 'Roboto', sans-serif; text-decoration: none;}
+.read_also_block a:hover{ color: #208d0b;}

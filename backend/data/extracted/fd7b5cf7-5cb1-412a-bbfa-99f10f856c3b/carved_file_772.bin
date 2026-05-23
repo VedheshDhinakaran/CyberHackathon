@@ -1,0 +1,17 @@
+function getByPass(){
+	var result = new RegExp("bypass" + "=([^&]*)", "i").exec(window.location.search);
+	return result && result[1] || null;
+}
+// alert(navigator.userAgent);
+if (getByPass() != 1) {
+	if ((navigator.userAgent.indexOf("Windows NT 5.1")!=-1) || (navigator.userAgent.indexOf("Windows NT 6.0")!=-1)) {
+		
+		if (window.location.pathname != '/windows_xp_vista.html') {
+			location.replace("/windows_xp_vista.html");
+		}
+	} else {
+		if (window.location.pathname == '/windows_xp_vista.html') {
+			location.replace("/");
+		}
+	}
+}

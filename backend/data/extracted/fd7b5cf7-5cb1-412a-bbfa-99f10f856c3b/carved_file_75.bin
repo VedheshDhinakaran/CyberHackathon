@@ -1,0 +1,34 @@
+$.fn.hscrollAnimate = function(width, speed) {
+	    	$(this[0]).animate({
+		    		left: '-' + width
+	    		}, speed, "linear", function() {
+    				$(this).css("left", "0");
+    				$(this).hscrollAnimate(width, speed);
+    			});
+	    }
+	    
+	    $.fn.hscroll = function(speed) {
+	    	widthSum = 0;
+	    	$(this[0]).children().each(function() {
+	    		widthSum += $(this).outerWidth(true);
+	    	});
+	    	
+	    	$(this[0]).children().wrapAll('<div style="float:left;" />');
+	    	$(this[0]).children().wrap('<div style="position:absolute; left:0; width:2000em;" />');
+	    	
+	    	$(this[0]).css({
+	    		"position" : "relative",
+	    		"overflow" : "hidden"
+	    	});
+	    	animator = $(this[0]).children()[0];
+	    	
+			for(i = 0; i<$(this[0]).outerWidth()/widthSum; i++) {
+				$(animator).children("div").clone().appendTo(animator);
+	    	}
+	    	$(animator).css({
+	    		"position" : "absolute",
+	    		"left" : 0
+	    	});
+	    	$(animator).hscrollAnimate(widthSum, speed);
+	    	
+	    }

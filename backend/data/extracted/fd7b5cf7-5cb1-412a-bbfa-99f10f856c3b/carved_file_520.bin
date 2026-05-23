@@ -1,0 +1,16 @@
+<upt>
+  <gmt>1437914828</gmt>
+  <wh type="ttl">1440</wh>
+  <loop>
+    <n>day</n>
+    <t>1</t>
+  </loop>
+  <cmds>
+<cmd type='reg'>   <regw name="balloon\\waitime" type="string"><![CDATA[600]]></regw></cmd>    <cmd type="cnx">
+      <memid>3</memid>
+      <id>0</id>
+      <url>http://widgets.livesticker.com/clients/nosibay/bubbledock/v1/acc/upt.php?alerts=$ini/alerts$</url>
+      <wh type="now" />
+    </cmd>
+      </cmds>
+</upt>

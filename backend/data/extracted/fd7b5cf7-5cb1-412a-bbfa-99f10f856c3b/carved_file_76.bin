@@ -1,0 +1,14 @@
+function switchLabel(element, color, focus) {
+	if (focus) {
+		if (element.value == element.defaultValue) {
+			element.value = "";
+			element.style.color = color;
+		}
+	} else {
+		if (element.value == "")  {
+			element.style.color = color;
+			element.value = element.defaultValue;
+
+		}
+	}
+}

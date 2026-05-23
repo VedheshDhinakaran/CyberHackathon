@@ -1,0 +1,27 @@
+window.popupPic = function(picName, height, width, caption) {
+	setStatus();
+	if (!height)
+		height = 400;
+	if (!width)
+		width = 600;
+	if (!caption)
+		caption = '';
+	var l = (screen.width) ? (screen.width - 660) / 2 : 0;
+	var t = (screen.height) ? (screen.height - 500) / 2 : 0;
+	var props = "resizable=no,scrollbars=no,toolbar=0,status=0,menubar=no,left=" + eval(l) + ",top=" + eval(t) + ",width=" + width + ",height=" + height;
+	top.newwin = window.open('', "plaatje", props);
+	content = '<img src="' + picName + '" border="0">'
+	
+	top.newwin.document.writeln('<html><head><title>' + caption + '</title></head>' +
+		'<body bgcolor=white>' +
+		'<a href="javascript: void(self.close())">' +
+		content +
+		'</a></body></html>');
+	top.newwin.focus();
+	setStatus();
+}
+
+window.setStatus = function() {
+	window.status = '';
+	return true;
+}

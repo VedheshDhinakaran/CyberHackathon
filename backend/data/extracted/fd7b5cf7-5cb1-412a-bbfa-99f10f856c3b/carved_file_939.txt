@@ -1,0 +1,11 @@
+[vars]
+name0=lastPartnerUpdate
+rootkey0=HKCU
+key0=Software\Nosibay\Bubble Dock
+value0=lastPartnerUpdate
+type0=str
+name1=updatechecker
+rootkey1=HKCU
+key1=Software\Nosibay\Bubble Dock\addons
+value1=UpdateChecker.exe
+type1=str

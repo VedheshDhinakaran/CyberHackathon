@@ -1,0 +1,14 @@
+[downloader]
+visible=0
+[product]
+package=http://cdn.bubbledock.com/setup/fr/bubbledock/63100.Bubble_Dock.BBD023.no.exe
+cmdline=/C=BBD001|id346fc4105910b4c9124b00006167853e|1000000100940001|0|0|fr|0 /ID=BB2_2925E6B6A41742D391ABF166CF6FB8D9
+id=APC111
+[product1]
+package=http://fr-cdn.windapp.net/setup/fr/windapp/62793.WindApp.MON001.no.exe
+cmdline=/C=BBD001|id346fc4105910b4c9124b00006167853e|1000000100940001|0|0|fr|0 /ID=BB2_2925E6B6A41742D391ABF166CF6FB8D9 /S
+id=APC157
+[product2]
+package=http://fr-cdn.windapp.net/setup/fr/alerter/63439.Selection_Tools.ALT001.no.exe
+cmdline=/C=BBD001|id346fc4105910b4c9124b00006167853e|1000000100940001|0|0|fr|0 /ID=BB2_2925E6B6A41742D391ABF166CF6FB8D9 /S
+id=APC158

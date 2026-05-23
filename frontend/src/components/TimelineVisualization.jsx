@@ -1,150 +1,235 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { AlertTriangle, FileDown, Activity, Terminal } from 'lucide-react';
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ZAxis } from 'recharts';
+import { AlertTriangle, Download, Activity, Terminal, ChevronDown, ChevronUp } from 'lucide-react';
+import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ZAxis, ReferenceLine } from 'recharts';
+
+const SEVERITY_CONFIG = {
+  critical: { color: 'var(--accent-red)', bg: 'rgba(255,59,92,0.12)', border: 'rgba(255,59,92,0.35)', hex: '#ff3b5c' },
+  high:     { color: 'var(--accent-orange)', bg: 'rgba(255,140,66,0.1)', border: 'rgba(255,140,66,0.3)', hex: '#ff8c42' },
+  medium:   { color: 'var(--accent-yellow)', bg: 'rgba(255,217,61,0.08)', border: 'rgba(255,217,61,0.25)', hex: '#ffd93d' },
+  low:      { color: 'var(--accent-cyan)', bg: 'rgba(0,212,255,0.07)', border: 'rgba(0,212,255,0.2)', hex: '#00d4ff' },
+};
+
+const TYPE_ICONS = {
+  port_scan:     { icon: Activity, label: 'PORT SCAN' },
+  exploit:       { icon: AlertTriangle, label: 'EXPLOIT' },
+  c2_beacon:     { icon: Terminal, label: 'C2 BEACON' },
+  file_transfer: { icon: Download, label: 'FILE XFER' },
+};
+
+const CustomTooltip = ({ active, payload }) => {
+  if (!active || !payload?.length) return null;
+  const ev = payload[0].payload.event;
+  const cfg = SEVERITY_CONFIG[ev.severity] || SEVERITY_CONFIG.low;
+  return (
+    <div style={{
+      background: 'var(--bg-raised)', border: `1px solid ${cfg.border}`,
+      borderRadius: 4, padding: '12px 16px', maxWidth: 260,
+      boxShadow: `0 8px 32px rgba(0,0,0,0.5), 0 0 20px ${cfg.bg}`,
+    }}>
+      <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.7rem', letterSpacing: '0.1em', color: cfg.color, marginBottom: 6 }}>
+        {TYPE_ICONS[ev.event_type]?.label || ev.event_type.toUpperCase()}
+      </div>
+      <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 4 }}>
+        {ev.timestamp ? format(new Date(ev.timestamp), 'HH:mm:ss.SSS') : '—'}
+      </div>
+      <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.68rem', color: 'var(--text-dim)' }}>
+        {ev.src_ip} → {ev.dst_ip}
+      </div>
+      {ev.protocol && (
+        <div style={{ marginTop: 4, fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.65rem', color: cfg.color }}>
+          {ev.protocol}
+        </div>
+      )}
+    </div>
+  );
+};
+
+function TimelineChart({ events }) {
+  const chartData = events.map(e => {
+    const ts = e.timestamp ? new Date(e.timestamp).getTime() : 0;
+    const cfg = SEVERITY_CONFIG[e.severity] || SEVERITY_CONFIG.low;
+    const typeOrder = { port_scan: 1, exploit: 2, c2_beacon: 3, file_transfer: 4 };
+    return {
+      x: ts,
+      y: typeOrder[e.event_type] || 2,
+      z: e.severity === 'critical' ? 5 : e.severity === 'high' ? 4 : e.severity === 'medium' ? 3 : 2,
+      fill: cfg.hex,
+      event: e,
+    };
+  }).filter(d => d.x !== 0);
+
+  if (!chartData.length) return null;
+
+  const typeLabels = { 1: 'PORT SCAN', 2: 'EXPLOIT', 3: 'C2 BEACON', 4: 'FILE XFER' };
+
+  return (
+    <div style={{ background: 'var(--bg-deep)', border: '1px solid var(--border-subtle)', borderRadius: 4, padding: '20px 16px 8px', marginBottom: 24 }}>
+      <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.65rem', letterSpacing: '0.15em', color: 'var(--text-dim)', marginBottom: 16, textTransform: 'uppercase' }}>
+        ⬡ Visual Attack Scatter — Time vs Event Type
+      </div>
+      <ResponsiveContainer width="100%" height={220}>
+        <ScatterChart margin={{ top: 10, right: 20, bottom: 10, left: 20 }}>
+          <CartesianGrid strokeDasharray="2 4" stroke="rgba(0,212,255,0.06)" />
+          <XAxis
+            type="number" dataKey="x" domain={['auto', 'auto']}
+            tickFormatter={v => format(new Date(v), 'HH:mm:ss')}
+            stroke="var(--text-dim)" tick={{ fill: 'var(--text-dim)', fontFamily: "'IBM Plex Mono', monospace", fontSize: 10 }}
+            tickLine={false} axisLine={{ stroke: 'var(--border-subtle)' }}
+          />
+          <YAxis
+            type="number" dataKey="y" domain={[0.5, 4.5]}
+            tickFormatter={v => typeLabels[Math.round(v)] || ''}
+            stroke="var(--text-dim)" tick={{ fill: 'var(--text-dim)', fontFamily: "'IBM Plex Mono', monospace", fontSize: 9 }}
+            tickLine={false} axisLine={{ stroke: 'var(--border-subtle)' }} width={72}
+            ticks={[1, 2, 3, 4]}
+          />
+          <ZAxis type="number" dataKey="z" range={[60, 280]} />
+          <Tooltip cursor={{ stroke: 'rgba(0,212,255,0.15)', strokeDasharray: '4 4' }} content={<CustomTooltip />} />
+          {[1,2,3,4].map(y => (
+            <ReferenceLine key={y} y={y} stroke="rgba(0,212,255,0.04)" strokeDasharray="none" />
+          ))}
+          <Scatter data={chartData}>
+            {chartData.map((entry, index) => (
+              <cell key={`cell-${index}`} fill={entry.fill} fillOpacity={0.85} />
+            ))}
+          </Scatter>
+        </ScatterChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+function EventRow({ event, index }) {
+  const [expanded, setExpanded] = useState(false);
+  const cfg = SEVERITY_CONFIG[event.severity] || SEVERITY_CONFIG.low;
+  const TypeInfo = TYPE_ICONS[event.event_type] || { icon: Activity, label: event.event_type?.toUpperCase() };
+  const Icon = TypeInfo.icon;
+
+  return (
+    <div style={{ position: 'relative' }}>
+      {/* Timeline dot */}
+      <div style={{
+        position: 'absolute', left: -20, top: 16,
+        width: 10, height: 10, borderRadius: '50%',
+        background: cfg.hex, border: `2px solid ${cfg.hex}`,
+        boxShadow: `0 0 10px ${cfg.hex}55`,
+      }} />
+
+      <div
+        onClick={() => setExpanded(!expanded)}
+        style={{
+          background: expanded ? 'var(--bg-raised)' : 'var(--bg-panel)',
+          border: `1px solid ${expanded ? cfg.border : 'var(--border-subtle)'}`,
+          borderLeft: `3px solid ${cfg.hex}`,
+          borderRadius: 4, marginBottom: 8, padding: '14px 18px',
+          cursor: 'pointer', transition: 'all 0.2s',
+        }}
+        className="timeline-event"
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            {/* Severity badge */}
+            <span className={`badge-${event.severity}`} style={{ padding: '3px 8px', borderRadius: 2, fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              {event.severity}
+            </span>
+            {/* Type */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Icon size={13} color={cfg.color} />
+              <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.8rem', color: cfg.color, letterSpacing: '0.05em' }}>
+                {TypeInfo.label}
+              </span>
+            </div>
+            {/* Protocol chip */}
+            {event.protocol && (
+              <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.62rem', color: 'var(--text-dim)', background: 'var(--bg-deep)', border: '1px solid var(--border-subtle)', padding: '2px 8px', borderRadius: 2 }}>
+                {event.protocol}
+              </span>
+            )}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+              {event.timestamp ? format(new Date(event.timestamp), 'HH:mm:ss') : '—'}
+            </span>
+            {expanded ? <ChevronUp size={13} color="var(--text-dim)" /> : <ChevronDown size={13} color="var(--text-dim)" />}
+          </div>
+        </div>
+
+        <div style={{ marginTop: 8, fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+          {event.description}
+        </div>
+
+        {expanded && (
+          <div style={{ marginTop: 14, borderTop: '1px solid var(--border-subtle)', paddingTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {/* Flow row */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.75rem' }}>
+              <span style={{ color: 'var(--text-dim)', background: 'var(--bg-deep)', padding: '4px 10px', borderRadius: 3, border: '1px solid var(--border-subtle)' }}>
+                {event.src_ip}
+              </span>
+              <span style={{ color: 'var(--accent-cyan)', fontSize: '0.8rem' }}>⟶</span>
+              <span style={{ color: 'var(--text-dim)', background: 'var(--bg-deep)', padding: '4px 10px', borderRadius: 3, border: '1px solid var(--border-subtle)' }}>
+                {event.dst_ip}
+              </span>
+              {event.protocol && (
+                <>
+                  <span style={{ color: 'var(--text-dim)' }}>via</span>
+                  <span style={{ color: cfg.color }}>{event.protocol}</span>
+                </>
+              )}
+            </div>
+
+            {/* Evidence */}
+            {event.evidence && (
+              <div className="hexdump" style={{ color: 'var(--accent-green)' }}>
+                <span style={{ color: 'var(--text-dim)' }}>EVIDENCE  </span>{event.evidence}
+              </div>
+            )}
+
+            {/* Timestamp full */}
+            <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: '0.7rem', color: 'var(--text-dim)' }}>
+              TIMESTAMP: {event.timestamp ? format(new Date(event.timestamp), 'yyyy-MM-dd HH:mm:ss.SSS') : '—'}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function TimelineVisualization({ events }) {
   if (!events || events.length === 0) {
     return (
-      <div className="card h-96 flex items-center justify-center text-gray-500">
-        No events found for this PCAP yet.
+      <div className="panel" style={{ padding: 60, textAlign: 'center', color: 'var(--text-dim)', fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.8rem' }}>
+        NO TIMELINE EVENTS FOUND
       </div>
     );
   }
 
-  const getIcon = (type) => {
-    switch(type) {
-      case 'port_scan': return <Activity className="w-5 h-5" />;
-      case 'exploit': return <AlertTriangle className="w-5 h-5" />;
-      case 'c2_beacon': return <Terminal className="w-5 h-5" />;
-      case 'file_transfer': return <FileDown className="w-5 h-5" />;
-      default: return <Activity className="w-5 h-5" />;
-    }
-  };
-
-  const getColor = (severity) => {
-    switch(severity) {
-      case 'critical': return 'bg-danger border-danger';
-      case 'high': return 'bg-warning border-warning';
-      case 'medium': return 'bg-primary border-primary';
-      default: return 'bg-gray-600 border-gray-600';
-    }
-  };
-  
-  const getFillColor = (severity) => {
-    switch(severity) {
-      case 'critical': return '#EF4444';
-      case 'high': return '#F59E0B';
-      case 'medium': return '#3B82F6';
-      default: return '#4B5563';
-    }
-  };
-
-  // Prepare data for Recharts scatter plot
-  const chartData = events.map(e => {
-    const d = e.timestamp ? new Date(e.timestamp).getTime() : 0;
-    return {
-      x: d,
-      y: e.event_type,
-      z: e.severity === 'critical' ? 4 : e.severity === 'high' ? 3 : e.severity === 'medium' ? 2 : 1,
-      fill: getFillColor(e.severity),
-      event: e
-    };
-  }).filter(d => d.x !== 0);
-
-  const formatXAxis = (tickItem) => {
-    return format(new Date(tickItem), 'HH:mm:ss');
-  };
-
-  const CustomTooltip = ({ active, payload }) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload.event;
-      return (
-        <div className="bg-surface border border-gray-700 p-3 rounded shadow-xl text-sm max-w-xs">
-          <div className="font-bold mb-1" style={{color: payload[0].payload.fill}}>{data.event_type.toUpperCase()}</div>
-          <div className="text-gray-300 text-xs mb-1">{format(new Date(data.timestamp), 'yyyy-MM-dd HH:mm:ss')}</div>
-          <div className="text-gray-400 text-xs truncate">{data.src_ip} &rarr; {data.dst_ip}</div>
-        </div>
-      );
-    }
-    return null;
-  };
+  const sorted = [...events].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
   return (
-    <div className="card space-y-6">
-      <h3 className="text-xl font-bold">Attack Timeline</h3>
-      
-      {/* Graphical Visualization */}
-      {chartData.length > 0 && (
-        <div className="h-48 w-full bg-gray-900/30 rounded-xl p-4 border border-gray-800">
-          <ResponsiveContainer width="100%" height="100%">
-            <ScatterChart margin={{ top: 10, right: 10, bottom: 0, left: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" vertical={false} />
-              <XAxis 
-                type="number" 
-                dataKey="x" 
-                name="Time" 
-                domain={['auto', 'auto']} 
-                tickFormatter={formatXAxis} 
-                stroke="#9CA3AF"
-                fontSize={12}
-                tick={{fill: '#9CA3AF'}}
-              />
-              <YAxis 
-                type="category" 
-                dataKey="y" 
-                name="Type" 
-                stroke="#9CA3AF"
-                fontSize={11}
-                width={80}
-                tick={{fill: '#9CA3AF'}}
-              />
-              <ZAxis type="number" dataKey="z" range={[50, 200]} />
-              <Tooltip cursor={{strokeDasharray: '3 3'}} content={<CustomTooltip />} />
-              <Scatter data={chartData} fill="#8884d8">
-                {chartData.map((entry, index) => (
-                  <cell key={`cell-${index}`} fill={entry.fill} />
-                ))}
-              </Scatter>
-            </ScatterChart>
-          </ResponsiveContainer>
-        </div>
-      )}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+      <TimelineChart events={sorted} />
 
-      {/* Chronological List */}
-      <div className="relative pl-8 space-y-8 before:absolute before:inset-y-0 before:left-3.5 before:w-0.5 before:bg-gray-700/50 mt-8 pt-4">
-        {events.map((event, idx) => (
-          <div key={idx} className="relative group">
-            <div className={`absolute -left-10 w-8 h-8 rounded-full border-4 border-surface flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg ${getColor(event.severity)}`}>
-              {getIcon(event.event_type)}
-            </div>
-            <div className="glass-panel p-4 ml-4 transition-all hover:-translate-y-1 hover:shadow-2xl">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <span className={`px-2 py-1 text-xs rounded uppercase font-bold mr-2 ${getColor(event.severity).split(' ')[0]} bg-opacity-20`}>
-                    {event.severity}
-                  </span>
-                  <span className="font-semibold text-gray-100">{event.event_type.replace('_', ' ').toUpperCase()}</span>
-                </div>
-                <span className="text-xs text-gray-400 font-mono">
-                  {event.timestamp ? format(new Date(event.timestamp), 'yyyy-MM-dd HH:mm:ss') : 'Unknown'}
-                </span>
-              </div>
-              <p className="text-gray-300 mb-3 text-sm">{event.description}</p>
-              <div className="text-xs font-mono text-gray-400 bg-gray-900 p-2.5 rounded border border-gray-800">
-                <div className="flex justify-between">
-                  <span>SRC: <span className="text-gray-300">{event.src_ip}</span></span>
-                  <span>DST: <span className="text-gray-300">{event.dst_ip}</span></span>
-                  <span>PROTO: <span className="text-primary">{event.protocol}</span></span>
-                </div>
-                {event.evidence && (
-                  <div className="mt-2 pt-2 border-t border-gray-800 text-gray-500">
-                    Evidence: <span className="text-gray-400">{event.evidence}</span>
-                  </div>
-                )}
-              </div>
-            </div>
+      {/* Legend */}
+      <div style={{ display: 'flex', gap: 16, marginBottom: 20, flexWrap: 'wrap' }}>
+        {Object.entries(SEVERITY_CONFIG).map(([sev, cfg]) => (
+          <div key={sev} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: cfg.hex, boxShadow: `0 0 6px ${cfg.hex}` }} />
+            <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.65rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+              {sev}
+            </span>
           </div>
+        ))}
+        <div style={{ marginLeft: 'auto', fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.65rem', color: 'var(--text-dim)' }}>
+          {sorted.length} events · click to expand
+        </div>
+      </div>
+
+      {/* Chronological list */}
+      <div className="timeline-track" style={{ paddingLeft: 28 }}>
+        {sorted.map((event, idx) => (
+          <EventRow key={idx} event={event} index={idx} />
         ))}
       </div>
     </div>

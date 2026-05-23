@@ -1,92 +1,138 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
-import { UploadCloud, File as FileIcon } from 'lucide-react';
+import { UploadCloud, File as FileIcon, CheckCircle } from 'lucide-react';
 
 export default function UploadSection({ onUploadSuccess }) {
   const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const inputRef = useRef(null);
 
   const handleDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") setDragActive(true);
-    else if (e.type === "dragleave") setDragActive(false);
+    e.preventDefault(); e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') setDragActive(true);
+    else setDragActive(false);
   };
 
   const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault(); e.stopPropagation();
     setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFile(e.dataTransfer.files[0]);
-    }
+    if (e.dataTransfer.files?.[0]) setFile(e.dataTransfer.files[0]);
   };
 
   const handleChange = (e) => {
-    e.preventDefault();
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
-    }
+    if (e.target.files?.[0]) setFile(e.target.files[0]);
   };
 
   const onUpload = async () => {
     if (!file) return;
-    setUploading(true);
+    setUploading(true); setUploadProgress(0);
     try {
-      const res = await axios.post(`http://localhost:8000/upload?filename=${encodeURIComponent(file.name)}`, file, {
-        headers: { "Content-Type": "application/octet-stream" },
-        onUploadProgress: (progressEvent) => {
-           console.log(`Upload Progress: ${Math.round((progressEvent.loaded * 100) / progressEvent.total)}%`);
+      const res = await axios.post(
+        `http://localhost:8000/upload?filename=${encodeURIComponent(file.name)}`,
+        file,
+        {
+          headers: { 'Content-Type': 'application/octet-stream' },
+          onUploadProgress: (e) => setUploadProgress(Math.round((e.loaded * 100) / e.total)),
         }
-      });
-      if (res.data.status === "success") {
-        onUploadSuccess(res.data.file_id);
-      }
+      );
+      if (res.data.status === 'success') onUploadSuccess(res.data.file_id);
     } catch (e) {
-      console.error(e);
-      alert("Upload failed: " + (e.response?.data?.detail || e.message));
+      alert('Upload failed: ' + (e.response?.data?.detail || e.message));
     } finally {
       setUploading(false);
     }
   };
 
+  const fmt = (bytes) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  };
+
   return (
-    <div className="w-full max-w-2xl">
-      <div 
-        className={`glass-panel border-2 border-dashed p-12 flex flex-col items-center justify-center transition-all ${dragActive ? 'border-primary bg-primary/5' : 'border-gray-700'}`}
-        onDragEnter={handleDrag}
-        onDragLeave={handleDrag}
-        onDragOver={handleDrag}
-        onDrop={handleDrop}
+    <div style={{ width: '100%', maxWidth: 560 }}>
+      <input ref={inputRef} type="file" accept=".pcap,.pcapng" style={{ display: 'none' }} onChange={handleChange} />
+
+      <div
+        className={`upload-zone ${dragActive ? 'active-drag' : ''}`}
+        onDragEnter={handleDrag} onDragLeave={handleDrag}
+        onDragOver={handleDrag} onDrop={handleDrop}
+        style={{ padding: '48px 32px', textAlign: 'center' }}
       >
-        <input ref={inputRef} type="file" className="hidden" accept=".pcap,.pcapng" onChange={handleChange} />
-        
         {!file ? (
           <>
-            <div className="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mb-6">
-              <UploadCloud className="w-10 h-10 text-primary" />
+            <div style={{
+              width: 72, height: 72, borderRadius: '50%',
+              background: 'rgba(0,212,255,0.06)', border: '1px solid rgba(0,212,255,0.15)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              margin: '0 auto 20px', transition: 'all 0.3s',
+            }}>
+              <UploadCloud size={30} color="var(--accent-cyan)" style={{ opacity: dragActive ? 1 : 0.6 }} />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Drag & Drop PCAP file</h3>
-            <p className="text-gray-400 mb-6">or</p>
-            <button onClick={() => inputRef.current?.click()} className="px-6 py-2 bg-primary hover:bg-blue-600 rounded-lg font-medium transition-colors">
+            <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: 8 }}>
+              Drop PCAP / PCAPNG here
+            </div>
+            <div style={{ color: 'var(--text-dim)', fontSize: '0.82rem', marginBottom: 24, fontWeight: 400 }}>
+              or click to browse your filesystem
+            </div>
+            <button onClick={() => inputRef.current?.click()} className="btn-primary" style={{ fontSize: '0.78rem' }}>
               Browse Files
             </button>
           </>
         ) : (
           <>
-            <div className="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mb-6">
-              <FileIcon className="w-10 h-10 text-success" />
+            <div style={{
+              width: 64, height: 64, borderRadius: '50%',
+              background: 'rgba(0,255,136,0.08)', border: '1px solid rgba(0,255,136,0.2)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              margin: '0 auto 16px',
+            }}>
+              <FileIcon size={26} color="var(--accent-green)" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">{file.name}</h3>
-            <p className="text-gray-400 mb-6">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
-            <div className="flex space-x-4">
-              <button onClick={() => setFile(null)} className="px-6 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium transition-colors" disabled={uploading}>
-                Cancel
-              </button>
-              <button onClick={onUpload} className="px-6 py-2 bg-primary hover:bg-blue-600 rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center" disabled={uploading}>
-                {uploading ? 'Uploading...' : 'Start Analysis'}
+
+            <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.88rem', color: 'var(--text-primary)', marginBottom: 4 }}>
+              {file.name}
+            </div>
+            <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: '0.75rem', color: 'var(--text-dim)', marginBottom: 20 }}>
+              {fmt(file.size)}
+            </div>
+
+            {uploading && (
+              <div style={{ marginBottom: 20 }}>
+                <div className="progress-track" style={{ marginBottom: 6 }}>
+                  <div className="progress-fill" style={{ width: `${uploadProgress}%` }} />
+                </div>
+                <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: '0.7rem', color: 'var(--text-dim)' }}>
+                  Uploading... {uploadProgress}%
+                </div>
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+              {!uploading && (
+                <button onClick={() => setFile(null)} style={{
+                  background: 'none', border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-dim)', padding: '8px 20px', borderRadius: 3,
+                  fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.75rem',
+                  letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}>
+                  Cancel
+                </button>
+              )}
+              <button
+                onClick={onUpload}
+                disabled={uploading}
+                className="btn-primary"
+                style={{ opacity: uploading ? 0.6 : 1, fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: 6 }}
+              >
+                {uploading ? (
+                  <span>Uploading...</span>
+                ) : (
+                  <><CheckCircle size={13} /> Start Analysis</>
+                )}
               </button>
             </div>
           </>

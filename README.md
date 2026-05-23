@@ -113,7 +113,12 @@ Additional project documentation is available in the `docs/` folder:
 
 ## Contribution
 
-Contributions are welcome. Suggested improvements include:
+Team Members:
+Ganugapati Sai Sowmya - BL.EN.U4CSE23219
+Nikhil Sanjay - BL.EN.U4CSE23239
+Vedhesh Dhinakaran - BL.EN.U4CSE23257
+Andrew Tom Mathew - BL.EN.U4CSE23269
+. Suggested improvements include:
 - additional protocol parsers
 - broader file extraction support
 - enhanced detection rules

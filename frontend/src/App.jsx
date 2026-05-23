@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import Dashboard from './pages/Dashboard';
 import { Shield, Radio, Clock } from 'lucide-react';
 
+// Top-level application shell. Maintains the active PCAP session and live header state.
 function App() {
   const [activeFileId, setActiveFileId] = useState(null);
   const [time, setTime] = useState(new Date());
 
+  // Keep the header clock in sync with the current UTC time.
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(t);
@@ -16,7 +18,7 @@ function App() {
 
   return (
     <div className="min-h-screen scanlines">
-      {/* Header */}
+      {/* Page shell and top header for the analysis dashboard */}
       <header style={{
         background: 'rgba(5,8,16,0.96)',
         borderBottom: '1px solid rgba(0,212,255,0.12)',
@@ -24,7 +26,7 @@ function App() {
         backdropFilter: 'blur(12px)',
       }}>
         <div style={{ maxWidth: 1600, margin: '0 auto', padding: '0 24px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          {/* Logo */}
+          {/* Logo and application identity */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <div style={{
               width: 34, height: 34,
@@ -45,7 +47,7 @@ function App() {
             </div>
           </div>
 
-          {/* Center status */}
+          {/* Active session indicator shown when a file has been uploaded */}
           {activeFileId && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent-green)', boxShadow: '0 0 8px var(--accent-green)' }} className="animate-pulse-cyan" />
@@ -55,7 +57,7 @@ function App() {
             </div>
           )}
 
-          {/* Right: time + radio */}
+          {/* UTC clock and online indicator for the dashboard header */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <Clock size={11} color="var(--text-dim)" />
@@ -72,7 +74,7 @@ function App() {
           </div>
         </div>
 
-        {/* Progress stripe if loading */}
+        {/* Global progress bar for the header; updated by backend status polling in Dashboard */}
         <div id="header-progress-bar" style={{ height: 1, width: '100%', background: 'rgba(0,212,255,0.05)' }}>
           <div id="header-progress-fill" style={{ height: '100%', width: '0%', background: 'linear-gradient(90deg, transparent, var(--accent-cyan), transparent)', transition: 'width 0.4s ease' }} />
         </div>

@@ -11,11 +11,15 @@ const IOC_CONFIG = {
   url:    { color: 'var(--accent-green)', bg: 'rgba(0,255,136,0.08)', border: 'rgba(0,255,136,0.2)' },
 };
 
+// IOCPanel displays indicators of compromise and allows filtering/exporting the results.
+// It makes it easy to copy IOC values or look them up in external threat intelligence tools.
+
 function IOCCard({ ioc, expanded }) {
   const [copied, setCopied] = useState(false);
   const cfg = IOC_CONFIG[ioc.ioc_type] || { color: 'var(--text-dim)', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.1)' };
 
   const handleCopy = async () => {
+    // Copy the IOC value to the clipboard and show a temporary confirmation state.
     await navigator.clipboard.writeText(ioc.value);
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);

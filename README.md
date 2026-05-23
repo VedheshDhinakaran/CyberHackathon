@@ -1,82 +1,126 @@
-# NetRecon Forensics Workbench
+# CyberHackathon — Network Forensics Workbench
 
-NetRecon Forensics Workbench is a production-grade network forensic investigation suite tailored for cybersecurity analysts, SOCs, and academic demonstrations. It processes large PCAP files to automatically extract TCP streams, reconstruct transferred files, detect attacker activity, reconstruct attack timelines, and extract Indicators of Compromise (IOCs).
+CyberHackathon is a network forensic analysis platform for packet capture (PCAP) investigation. It combines a Python FastAPI backend with a React + Vite frontend to ingest PCAP/PCAPNG files, reassemble network sessions, reconstruct transferred files, detect attacker behavior, and build an attack timeline.
 
-## Features
+## Key Features
 
-- **Automated PCAP Ingestion:** Upload PCAP/PCAPNG files via a modern UI and process them asynchronously.
-- **TCP Stream Reassembly:** Automatically reconstructs full bidirectional TCP flows with statistics using `tshark`.
-- **File Reconstruction Engine:** Automatically rebuilds HTTP, SMB, and TFTP downloads. Generates hashes and calculates entropy.
-- **Attack Detection:** Uses behavioral analysis to detect Port Scans, Exploit Attempts, and C2 Beacons.
-- **Timeline Reconstruction:** Automatically generates a chronological timeline of the attack, classifying events by severity.
-- **Zeek Integration:** Natively invokes Zeek (if available) to parse network streams and generate rich contextual logs.
-- **Modern Dashboard UI:** A React + TailwindCSS driven dashboard featuring a dark mode UI, smooth animations, and SOC-inspired data tables.
+- **PCAP Ingestion** — Upload captures through a modern web dashboard.
+- **Session Analysis** — Reassemble TCP/UDP sessions and identify protocol flows.
+- **File Extraction** — Extract HTTP payloads and reconstructed file objects.
+- **Attack Detection** — Spot port scans, exploit attempts, C2 beacons, and suspicious traffic.
+- **Timeline Generation** — Build a chronological sequence of detected events.
+- **IOC Extraction** — Collect IPs, domains, hashes, and other indicators.
 
-## Architecture
+## Repository Structure
 
-NetRecon is split into two main components:
-- **Backend:** A FastAPI-based Python 3.11 service utilizing `Scapy`, `tshark`, and `Zeek` for deep packet inspection, with an SQLite database for storing metadata and reconstructed state.
-- **Frontend:** A React + Vite frontend utilizing TailwindCSS, providing dynamic interfaces for investigators.
+- `backend/` — FastAPI server, DB models, analyzers, detectors, parsers, and reporting logic.
+- `frontend/` — React + Vite dashboard, data visualizations, and user interface.
+- `data/` — Storage for uploads, extracted artifacts, Zeek logs, and database files.
+- `docs/` — Documentation and examples.
+- `examples/` — Example PCAP files and sample reports.
+- `start.ps1` — Convenience script to launch the application.
 
-### System Requirements
+## Requirements
 
-- Windows, Linux, or macOS.
-- **Python 3.11+**
-- **Node.js 18+**
-- **Wireshark / tshark:** Must be installed and accessible in your system PATH. 
-- *(Optional) Zeek: If installed, the backend will utilize it for additional context.*
+- Python 3.11+
+- Node.js 18+
+- `pip` and `npm`
+- `tshark` installed and available on `PATH`
+- Optional: `zeek` for richer network context
 
-## Getting Started
+## Setup
 
-### 1. Prerequisites (Windows)
-1. Install [Wireshark](https://www.wireshark.org/). During installation, ensure `tshark` is selected. 
-2. Add the Wireshark directory (e.g., `C:\Program Files\Wireshark`) to your System Environment Variables (PATH).
-3. Ensure Python and Node.js are installed.
+### Backend
 
-### 2. First-Time Setup
-Open your terminal in the project directory:
-
-**Setup Backend:**
 ```powershell
 cd backend
 pip install -r requirements.txt
-cd ..
 ```
 
-**Setup Frontend:**
+### Frontend
+
 ```powershell
 cd frontend
 npm install
-cd ..
 ```
 
-### 3. Running the Application
-We've provided a simple startup script to launch both the frontend and backend simultaneously.
+## Running the Project
+
+### Recommended
+
+From the repository root:
 
 ```powershell
 .\start.ps1
 ```
 
-*Alternatively, you can manually run them in separate terminals:*
-* **Backend:** `cd backend` -> `uvicorn main:app --host 0.0.0.0 --port 8000`
-* **Frontend:** `cd frontend` -> `npm run dev`
+### Manual Startup
 
-## Usage Workflow
+Backend:
 
-1. Open the Dashboard in your browser (usually `http://localhost:5173`).
-2. Drag and drop a malicious PCAP file into the Upload section.
-3. The platform will automatically begin parsing, utilizing Zeek and tshark in the background.
-4. Watch the progress bar as the system runs stream reassembly, file extraction, and timeline building.
-5. Once complete, review the Attack Timeline to understand the chronological sequence of the attack.
-6. Check the Extracted Files panel to download payloads, and the IOC Panel to export malicious IPs and hashes.
+```powershell
+cd backend
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
 
-## Future Scope
+Frontend:
 
-- **Sigma/YARA Integration:** Add native rule matching for payloads.
-- **GeoIP Mapping:** Plot suspicious IPs on a global map.
-- **Suricata Integration:** Import alerts directly from Suricata logs.
-- **MITRE ATT&CK Mapping:** Map detected behaviors to ATT&CK tactics and techniques.
+```powershell
+cd frontend
+npm run dev
+```
+
+The frontend defaults to `http://localhost:5173` and communicates with the backend at `http://localhost:8000`.
+
+## Usage
+
+1. Open the dashboard in your browser.
+2. Upload a PCAP or PCAPNG file.
+3. Wait for the analysis pipeline to complete.
+4. Review the dashboard tabs:
+   - **Overview** — attack summary and detection statistics
+   - **Timeline** — ordered event history
+   - **Network Flow** — session and protocol visualization
+   - **Sessions** — detailed TCP/UDP session list
+   - **Files** — extracted payloads and metadata
+   - **IOCs** — collected indicators of compromise
+
+## Development Notes
+
+- `backend/main.py` starts the FastAPI service.
+- `backend/models/database.py` defines the SQLite schema.
+- `backend/analyzers/tcp_reassembler.py` handles session reconstruction.
+- `frontend/src/pages/Dashboard.jsx` orchestrates data fetching and tabbed views.
+- `frontend/src/components/NetworkFlowChart.jsx` renders protocol/session analytics.
+
+## Troubleshooting
+
+- If uploads fail, verify `tshark` is installed and accessible from the command line.
+- If the frontend cannot reach the backend, confirm the backend is running on port `8000`.
+- For Python dependency issues, reinstall backend requirements:
+
+```powershell
+cd backend
+pip install -r requirements.txt
+```
+
+## Documentation
+
+Additional project documentation is available in the `docs/` folder:
+
+- `docs/setup.md` — detailed installation and run instructions
+- `docs/threat_model.md` — attacker model, assumptions, and security considerations
+
+## Contribution
+
+Contributions are welcome. Suggested improvements include:
+- additional protocol parsers
+- broader file extraction support
+- enhanced detection rules
+- MITRE ATT&CK mapping
+- threat intelligence enrichment
 
 ## License
 
-MIT License
+This project is released under the MIT License.
+

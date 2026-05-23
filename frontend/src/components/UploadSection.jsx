@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { UploadCloud, File as FileIcon, CheckCircle } from 'lucide-react';
 
+// UploadSection handles drag-and-drop and file selection for PCAP uploads.
+// It reports upload progress and invokes the parent callback when a new file is accepted.
 export default function UploadSection({ onUploadSuccess }) {
   const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState(null);
@@ -9,6 +11,7 @@ export default function UploadSection({ onUploadSuccess }) {
   const [uploadProgress, setUploadProgress] = useState(0);
   const inputRef = useRef(null);
 
+  // Manage drag state for the drop zone UX.
   const handleDrag = (e) => {
     e.preventDefault(); e.stopPropagation();
     if (e.type === 'dragenter' || e.type === 'dragover') setDragActive(true);

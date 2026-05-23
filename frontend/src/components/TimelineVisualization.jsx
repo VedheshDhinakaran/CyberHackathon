@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { AlertTriangle, Download, Activity, Terminal, ChevronDown, ChevronUp } from 'lucide-react';
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ZAxis, ReferenceLine } from 'recharts';
 
+// Severity colors and visual styling for timeline markers and tooltips.
 const SEVERITY_CONFIG = {
   critical: { color: 'var(--accent-red)', bg: 'rgba(255,59,92,0.12)', border: 'rgba(255,59,92,0.35)', hex: '#ff3b5c' },
   high:     { color: 'var(--accent-orange)', bg: 'rgba(255,140,66,0.1)', border: 'rgba(255,140,66,0.3)', hex: '#ff8c42' },
@@ -17,7 +18,9 @@ const TYPE_ICONS = {
   file_transfer: { icon: Download, label: 'FILE XFER' },
 };
 
+// Custom tooltip for timeline scatter points. Shows event metadata on hover.
 const CustomTooltip = ({ active, payload }) => {
+  // Tooltip content for the scatter chart. Shows a concise event preview on hover.
   if (!active || !payload?.length) return null;
   const ev = payload[0].payload.event;
   const cfg = SEVERITY_CONFIG[ev.severity] || SEVERITY_CONFIG.low;

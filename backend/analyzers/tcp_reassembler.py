@@ -4,7 +4,9 @@ from sqlalchemy.orm import Session
 from models.database import TCPSession
 from datetime import datetime
 
+
 def inet_to_str(inet):
+    """Convert a packed IP address into a readable string form."""
     try:
         return socket.inet_ntop(socket.AF_INET, inet)
     except ValueError:
@@ -12,11 +14,16 @@ def inet_to_str(inet):
 
 
 def guess_protocol(packet_type: str, sport: int, dport: int, payload: bytes) -> str:
+    """Infer an application protocol from a packet type, ports, and payload markers."""
     payload = payload or b''
+
     if packet_type == 'TCP':
+        # Look for HTTP request/response signatures first.
         http_signatures = [b'HTTP/', b'GET ', b'POST ', b'PUT ', b'DELETE ', b'HEAD ', b'OPTIONS ', b'PATCH ', b'CONNECT ']
         if any(payload.startswith(sig) for sig in http_signatures):
             return 'HTTP'
+
+        # Use common TCP ports as a fallback.
         if sport in (80, 8080, 8000) or dport in (80, 8080, 8000):
             return 'HTTP'
         if sport == 443 or dport == 443 or payload.startswith(b'\x16\x03'):
@@ -26,7 +33,9 @@ def guess_protocol(packet_type: str, sport: int, dport: int, payload: bytes) -> 
         if sport == 445 or dport == 445:
             return 'SMB'
         return 'TCP'
+
     if packet_type == 'UDP':
+        # Match common UDP service ports.
         if sport == 53 or dport == 53:
             return 'DNS'
         if sport == 123 or dport == 123:
@@ -38,31 +47,34 @@ def guess_protocol(packet_type: str, sport: int, dport: int, payload: bytes) -> 
         if sport == 161 or dport == 161:
             return 'SNMP'
         return 'UDP'
+
     return 'UNKNOWN'
 
 
 def process(file_path: str, file_id: str, db: Session):
+    """Read a capture file, group packets into sessions, and write session metadata to the database."""
     sessions = {}
-    
+
     try:
         with open(file_path, 'rb') as f:
-            # Handle both PCAP and PCAPNG
+            # Attempt PCAP first, then fall back to PCAPNG.
             try:
                 pcap = dpkt.pcap.Reader(f)
             except ValueError:
                 f.seek(0)
                 pcap = dpkt.pcapng.Reader(f)
-                
+
             for ts, buf in pcap:
                 try:
                     eth = dpkt.ethernet.Ethernet(buf)
                 except Exception:
+                    # Skip malformed or unsupported frames.
                     continue
-                
-                # Check for IP
+
+                # Only process IPv4/IPv6 packets.
                 if not isinstance(eth.data, dpkt.ip.IP) and not isinstance(eth.data, dpkt.ip6.IP6):
                     continue
-                    
+
                 ip = eth.data
                 packet = ip.data
                 packet_type = None
@@ -75,6 +87,7 @@ def process(file_path: str, file_id: str, db: Session):
                     packet_type = 'UDP'
                     payload = packet.data
                 else:
+                    # Skip non-TCP/UDP payloads.
                     continue
 
                 src_ip = inet_to_str(ip.src)
@@ -83,6 +96,7 @@ def process(file_path: str, file_id: str, db: Session):
                 dst_port = packet.dport
                 protocol = guess_protocol(packet_type, src_port, dst_port, payload)
 
+                # Use a symmetric session key so both directions are grouped together.
                 key = (protocol, tuple(sorted([f"{src_ip}:{src_port}", f"{dst_ip}:{dst_port}"])))
 
                 if key not in sessions:
@@ -97,18 +111,18 @@ def process(file_path: str, file_id: str, db: Session):
                         "start_time": ts,
                         "end_time": ts
                     }
-                
+
                 sessions[key]["packet_count"] += 1
                 sessions[key]["byte_count"] += len(buf)
                 sessions[key]["end_time"] = max(sessions[key]["end_time"], ts)
-                
+
     except Exception as e:
         print(f"TCP Reassembler error: {e}")
         return
 
-    # Bulk insert
+    # Persist aggregated session records to the database.
     try:
-        for k, v in sessions.items():
+        for _, v in sessions.items():
             db.add(TCPSession(
                 pcap_id=file_id,
                 src_ip=v["src_ip"],

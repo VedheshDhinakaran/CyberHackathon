@@ -1,6 +1,8 @@
 import React from 'react';
 import { File, Download, Hash, Cpu } from 'lucide-react';
 
+// FileBrowser renders a card grid for all extracted files and visualizes entropy information.
+// Colors associated with different MIME types
 const MIME_COLORS = {
   'application/x-msdownload': { color: 'var(--accent-red)', label: 'EXE' },
   'application/x-sharedlib':  { color: 'var(--accent-orange)', label: 'DLL' },
@@ -13,6 +15,7 @@ const MIME_COLORS = {
 };
 
 function EntropyBar({ entropy }) {
+  // Render a small entropy meter that indicates how likely the file is packed or encrypted.
   if (entropy == null) return null;
   const val = Math.min(8, Math.max(0, parseFloat(entropy)));
   const pct = (val / 8) * 100;

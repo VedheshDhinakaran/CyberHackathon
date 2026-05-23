@@ -1,6 +1,7 @@
 import React from 'react';
 import { Cpu, ArrowRight, Clock, Activity } from 'lucide-react';
 
+// Map protocol names to UI colors for easier scanning in the session table.
 const PROTOCOL_COLOR = {
   TCP: 'var(--accent-cyan)',
   UDP: 'var(--accent-green)',
@@ -17,6 +18,7 @@ const PROTOCOL_COLOR = {
 };
 
 export default function SessionTable({ sessions }) {
+  // Simple fallback when no session data is available.
   if (!sessions || sessions.length === 0) {
     return (
       <div className="panel" style={{ padding: '24px', textAlign: 'center' }}>

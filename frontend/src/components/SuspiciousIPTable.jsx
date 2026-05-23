@@ -1,5 +1,9 @@
 import React from 'react';
 
+// SuspiciousIPTable aggregates event sources and ranks them by risk.
+// It is used to highlight potentially compromised or attacker-controlled hosts.
+
+// SuspiciousIPTable aggregates source IP addresses and highlights the riskiest hosts.
 export default function SuspiciousIPTable({ events }) {
   const ips = {};
   events.forEach(e => {

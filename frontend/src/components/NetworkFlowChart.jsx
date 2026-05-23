@@ -1,9 +1,11 @@
 ﻿import React, { useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Legend, Cell } from 'recharts';
 
+// Colors used for protocol slices in the chart.
 const COLORS = ['#00d4ff', '#ff3b5c', '#ff8c42', '#7c5cfc', '#00ff88', '#ffd93d', '#a855f7', '#f59e0b'];
 
 export default function NetworkFlowChart({ sessions = [] }) {
+  // Build summary data from the session list.
   const { protocolData, flowData, hourlyData } = useMemo(() => {
     const protos = {};
     const pairs = {};
@@ -11,6 +13,8 @@ export default function NetworkFlowChart({ sessions = [] }) {
 
     sessions.forEach((session) => {
       const protocol = session.protocol || 'UNKNOWN';
+
+      // Count sessions per protocol category.
       protos[protocol] = (protos[protocol] || 0) + 1;
 
       const pairKey = `${session.src_ip}:${session.src_port} → ${session.dst_ip}:${session.dst_port}`;
@@ -24,6 +28,7 @@ export default function NetworkFlowChart({ sessions = [] }) {
           bytes: 0,
         };
       }
+
       pairs[pairKey].count += 1;
       pairs[pairKey].bytes += session.byte_count || 0;
 

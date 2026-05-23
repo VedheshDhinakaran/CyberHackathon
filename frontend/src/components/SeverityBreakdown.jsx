@@ -1,6 +1,9 @@
 import React from 'react';
 import { RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer, Tooltip } from 'recharts';
 
+// SeverityBreakdown computes event severity counts and renders a radar view of attack types.
+// This widget gives a high-level picture of security event distribution in the capture.
+
 export default function SeverityBreakdown({ events }) {
   const counts = { critical: 0, high: 0, medium: 0, low: 0 };
   const byType = {};

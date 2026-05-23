@@ -10,8 +10,8 @@ import SessionTable from '../components/SessionTable';
 import SeverityBreakdown from '../components/SeverityBreakdown';
 import { Activity, ShieldAlert, FileSearch, Globe, AlertTriangle, Cpu, Download, FileJson } from 'lucide-react';
 
+// Base URL for the backend API. The dashboard fetches analysis results from this service.
 const API_BASE = 'http://localhost:8000';
-
 // ── Mock data for preview when no backend ──────────────────────────────────────
 const MOCK_TIMELINE = [
   { event_type: 'port_scan', severity: 'high', timestamp: '2024-01-15T10:02:11Z', src_ip: '192.168.1.105', dst_ip: '10.0.0.1', protocol: 'TCP', description: 'Rapid SYN sweep across 1024 ports detected. Classic nmap fingerprint pattern.', evidence: 'SYN flags, no ACK response, sequential port pattern' },
@@ -47,6 +47,8 @@ export default function Dashboard({ activeFileId, setActiveFileId }) {
   const [activeTab, setActiveTab] = useState('overview');
   const [useMock, setUseMock] = useState(false);
 
+  // Poll backend analysis status every two seconds while a file is processing.
+  // Once processing completes, load all related dashboard data.
   useEffect(() => {
     if (!activeFileId) return;
     const pollStatus = setInterval(async () => {
@@ -64,6 +66,9 @@ export default function Dashboard({ activeFileId, setActiveFileId }) {
     return () => clearInterval(pollStatus);
   }, [activeFileId]);
 
+  // Fetch all analysis payloads from the backend once processing is complete.
+  // Fetch the completed analysis payloads for the selected file.
+  // This includes the event timeline, extracted files, IOCs, and reconstructed sessions.
   const fetchData = async () => {
     try {
       const [tlRes, filesRes, iocsRes, sessionsRes] = await Promise.all([

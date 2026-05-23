@@ -1,0 +1,63 @@
+%% Architecture diagram (Mermaid source)
+graph TD
+  User([Security Analyst])
+
+  subgraph Frontend [React + Vite + TailwindCSS]
+    UI[Dashboard]
+    Upload[UploadSection]
+    Timeline[TimelineVisualization]
+    Files[FileBrowser]
+    IOCs[IOCPanel]
+    Sessions[SessionTable]
+    Network[NetworkFlowChart]
+    UI --> Upload
+    UI --> Timeline
+    UI --> Files
+    UI --> IOCs
+    UI --> Sessions
+    UI --> Network
+  end
+
+  subgraph Backend [FastAPI + Workers]
+    API[REST API]
+    Ingest[Ingestion Service]
+    Tasks[Background Task Queue]
+    DB[(SQLite / SQLAlchemy)]
+
+    subgraph Parsers
+      PCAP[pcap_parser]
+      ZEEK[zeek_parser]
+    end
+
+    subgraph Analyzers
+      TCP[TCP Reassembler]
+      FILEX[File Extractor]
+      REASSEMBLY[Session Builder]
+    end
+
+    subgraph Detectors
+      ATTACK[Attack Detector]
+      C2[C2 Detector]
+    end
+
+    API --> Ingest
+    Ingest --> Tasks
+    Tasks --> Parsers
+    Tasks --> Analyzers
+    Tasks --> Detectors
+    Parsers --> DB
+    Analyzers --> DB
+    Detectors --> DB
+  end
+
+  subgraph Storage [Local Storage]
+    FS[data/uploads & data/extracted]
+    ZEEKS[data/zeek]
+  end
+
+  User <-->|HTTP/REST| UI
+  Upload -->|POST /upload| API
+  API -->|enqueue| Tasks
+  Analyzers -->|write files| FS
+  Parsers -->|write zeek logs| ZEEKS
+  DB <-->|metadata & results| API

@@ -10,6 +10,37 @@ def inet_to_str(inet):
     except ValueError:
         return socket.inet_ntop(socket.AF_INET6, inet)
 
+
+def guess_protocol(packet_type: str, sport: int, dport: int, payload: bytes) -> str:
+    payload = payload or b''
+    if packet_type == 'TCP':
+        http_signatures = [b'HTTP/', b'GET ', b'POST ', b'PUT ', b'DELETE ', b'HEAD ', b'OPTIONS ', b'PATCH ', b'CONNECT ']
+        if any(payload.startswith(sig) for sig in http_signatures):
+            return 'HTTP'
+        if sport in (80, 8080, 8000) or dport in (80, 8080, 8000):
+            return 'HTTP'
+        if sport == 443 or dport == 443 or payload.startswith(b'\x16\x03'):
+            return 'HTTPS'
+        if sport == 22 or dport == 22:
+            return 'SSH'
+        if sport == 445 or dport == 445:
+            return 'SMB'
+        return 'TCP'
+    if packet_type == 'UDP':
+        if sport == 53 or dport == 53:
+            return 'DNS'
+        if sport == 123 or dport == 123:
+            return 'NTP'
+        if sport == 69 or dport == 69:
+            return 'TFTP'
+        if sport in (67, 68) or dport in (67, 68):
+            return 'DHCP'
+        if sport == 161 or dport == 161:
+            return 'SNMP'
+        return 'UDP'
+    return 'UNKNOWN'
+
+
 def process(file_path: str, file_id: str, db: Session):
     sessions = {}
     
@@ -33,30 +64,40 @@ def process(file_path: str, file_id: str, db: Session):
                     continue
                     
                 ip = eth.data
-                
-                # Check for TCP
-                if not isinstance(ip.data, dpkt.tcp.TCP):
+                packet = ip.data
+                packet_type = None
+                payload = b''
+
+                if isinstance(packet, dpkt.tcp.TCP):
+                    packet_type = 'TCP'
+                    payload = packet.data
+                elif isinstance(packet, dpkt.udp.UDP):
+                    packet_type = 'UDP'
+                    payload = packet.data
+                else:
                     continue
-                    
-                tcp = ip.data
-                
+
                 src_ip = inet_to_str(ip.src)
                 dst_ip = inet_to_str(ip.dst)
-                src_port = tcp.sport
-                dst_port = tcp.dport
-                
-                key = tuple(sorted([f"{src_ip}:{src_port}", f"{dst_ip}:{dst_port}"]))
-                
+                src_port = packet.sport
+                dst_port = packet.dport
+                protocol = guess_protocol(packet_type, src_port, dst_port, payload)
+
+                key = (protocol, tuple(sorted([f"{src_ip}:{src_port}", f"{dst_ip}:{dst_port}"])))
+
                 if key not in sessions:
                     sessions[key] = {
-                        "src_ip": src_ip, "dst_ip": dst_ip,
-                        "src_port": src_port, "dst_port": dst_port,
+                        "src_ip": src_ip,
+                        "dst_ip": dst_ip,
+                        "src_port": src_port,
+                        "dst_port": dst_port,
+                        "protocol": protocol,
                         "packet_count": 0,
                         "byte_count": 0,
                         "start_time": ts,
                         "end_time": ts
                     }
-                    
+                
                 sessions[key]["packet_count"] += 1
                 sessions[key]["byte_count"] += len(buf)
                 sessions[key]["end_time"] = max(sessions[key]["end_time"], ts)
@@ -74,7 +115,7 @@ def process(file_path: str, file_id: str, db: Session):
                 dst_ip=v["dst_ip"],
                 src_port=v["src_port"],
                 dst_port=v["dst_port"],
-                protocol="TCP",
+                protocol=v["protocol"],
                 packet_count=v["packet_count"],
                 byte_count=v["byte_count"],
                 session_duration=v["end_time"] - v["start_time"],

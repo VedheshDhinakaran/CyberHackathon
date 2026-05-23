@@ -6,6 +6,7 @@ import SuspiciousIPTable from '../components/SuspiciousIPTable';
 import FileBrowser from '../components/FileBrowser';
 import IOCPanel from '../components/IOCPanel';
 import NetworkFlowChart from '../components/NetworkFlowChart';
+import SessionTable from '../components/SessionTable';
 import SeverityBreakdown from '../components/SeverityBreakdown';
 import { Activity, ShieldAlert, FileSearch, Globe, AlertTriangle, Cpu, Download, FileJson } from 'lucide-react';
 
@@ -42,6 +43,7 @@ export default function Dashboard({ activeFileId, setActiveFileId }) {
   const [timeline, setTimeline] = useState([]);
   const [files, setFiles] = useState([]);
   const [iocs, setIocs] = useState([]);
+  const [sessions, setSessions] = useState([]);
   const [activeTab, setActiveTab] = useState('overview');
   const [useMock, setUseMock] = useState(false);
 
@@ -64,15 +66,19 @@ export default function Dashboard({ activeFileId, setActiveFileId }) {
 
   const fetchData = async () => {
     try {
-      const [tlRes, filesRes, iocsRes] = await Promise.all([
+      const [tlRes, filesRes, iocsRes, sessionsRes] = await Promise.all([
         axios.get(`${API_BASE}/timeline/${activeFileId}`),
         axios.get(`${API_BASE}/files/${activeFileId}`),
-        axios.get(`${API_BASE}/iocs/${activeFileId}`)
+        axios.get(`${API_BASE}/iocs/${activeFileId}`),
+        axios.get(`${API_BASE}/sessions/${activeFileId}`),
       ]);
       setTimeline(tlRes.data);
       setFiles(filesRes.data);
       setIocs(iocsRes.data);
-    } catch { }
+      setSessions(sessionsRes.data);
+    } catch (error) {
+      console.error('Failed fetching dashboard data', error);
+    }
   };
 
   // Preview mode with mock data
@@ -95,6 +101,7 @@ export default function Dashboard({ activeFileId, setActiveFileId }) {
     { id: 'overview', label: 'Overview' },
     { id: 'timeline', label: 'Timeline' },
     { id: 'network', label: 'Network Flow' },
+    { id: 'sessions', label: `Sessions (${sessions.length})` },
     { id: 'files', label: `Files (${files.length})` },
     { id: 'iocs', label: `IOCs (${iocs.length})` },
   ];
@@ -193,9 +200,9 @@ export default function Dashboard({ activeFileId, setActiveFileId }) {
               { label: 'Files Extracted', value: files.length, icon: FileSearch, accent: 'var(--accent-cyan)', bg: 'rgba(0,212,255,0.08)' },
               { label: 'IOCs Detected', value: iocs.length, icon: Globe, accent: 'var(--accent-purple)', bg: 'rgba(124,92,252,0.08)' },
               { label: 'Timeline Events', value: timeline.length, icon: Activity, accent: 'var(--accent-green)', bg: 'rgba(0,255,136,0.08)' },
+              { label: 'Network Sessions', value: sessions.length, icon: Cpu, accent: 'var(--accent-yellow)', bg: 'rgba(255,217,61,0.08)' },
               { label: 'Unique Sources', value: [...new Set(timeline.map(t => t.src_ip))].length, icon: Cpu, accent: 'var(--accent-yellow)', bg: 'rgba(255,217,61,0.08)' },
-              { label: 'Attack Duration', value: timeline.length > 1 ? `${Math.round((new Date(timeline[timeline.length-1]?.timestamp) - new Date(timeline[0]?.timestamp)) / 60000)}m` : '—', icon: Activity, accent: 'var(--accent-cyan)', bg: 'rgba(0,212,255,0.06)' },
-              { label: 'Protocols', value: [...new Set(timeline.map(t => t.protocol))].length, icon: Globe, accent: 'var(--accent-purple)', bg: 'rgba(124,92,252,0.06)' },
+              { label: 'Protocols', value: [...new Set(sessions.map(s => s.protocol))].length, icon: Globe, accent: 'var(--accent-purple)', bg: 'rgba(124,92,252,0.06)' },
             ].map((s, i) => (
               <div key={i} className="stat-card" style={{ '--card-accent': s.accent }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
@@ -256,7 +263,11 @@ export default function Dashboard({ activeFileId, setActiveFileId }) {
             )}
 
             {activeTab === 'network' && (
-              <NetworkFlowChart events={timeline} />
+              <NetworkFlowChart sessions={sessions} />
+            )}
+
+            {activeTab === 'sessions' && (
+              <SessionTable sessions={sessions} />
             )}
 
             {activeTab === 'files' && (

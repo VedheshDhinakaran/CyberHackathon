@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+
+# Virtual Environment
+venv/
+.env/
+.venv/
+
+# VS Code
+.vscode/
+
+# Logs
+logs/*.log
+*.log
+
+# Outputs
+outputs/*.json
+outputs/*.html
+outputs/*.txt
+
+# Sample Outputs
+sample_outputs/*.json
+sample_outputs/*.html
+
+# Screenshots
+screenshots/*.png
+screenshots/*.jpg
+screenshots/*.jpeg
+
+# Dataset / PCAP Files
+pcaps/*.pcap
+pcaps/*.pcapng
+pcaps/*.cap
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Temporary Files
+*.tmp
+*.bak
